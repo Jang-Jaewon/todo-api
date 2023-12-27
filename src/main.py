@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Body
 from typing import Dict
+
+from fastapi import Body, FastAPI, HTTPException
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -27,7 +28,7 @@ todo_data: Dict[int, TodoItem] = {
 }
 
 
-@app.get("/todos")
+@app.get("/todos", status_code=200)
 def get_todos(order: str | None = None):
     result = list(todo_data.values())
     if order == "DESC":
@@ -35,33 +36,32 @@ def get_todos(order: str | None = None):
     return result
 
 
-@app.post("/todos")
+@app.post("/todos", status_code=201)
 def create_todos(request: CreateTodoRequest):
     todo_data[request.id] = request.dict()
     return todo_data[request.id]
 
 
-@app.get("/todos/{todo_id}")
+@app.get("/todos/{todo_id}", status_code=200)
 def get_todo(todo_id: int):
-    result = todo_data.get(todo_id, {})
-    return result
+    todo = todo_data.get(todo_id)
+    if todo is None:
+        raise HTTPException(status_code=404, detail="Todo Not Found")
+    return todo
 
 
-@app.patch("/todos/{todo_id}")
-def update_todo(
-        todo_id: int,
-        is_done: bool = Body(..., embed=True),
-):
-    result = todo_data.get(todo_id)
-    print(result)
-    if result:
-        result.is_done = is_done
-        return result
-    return {}
+@app.patch("/todos/{todo_id}", status_code=200)
+def update_todo(todo_id: int, is_done: bool = Body(..., embed=True)):
+    todo = todo_data.get(todo_id)
+    if todo is None:
+        raise HTTPException(status_code=404, detail="Todo Not Found")
+    todo.is_done = is_done
+    return todo
 
 
-@app.delete("/todos/{todo_id}")
+@app.delete("/todos/{todo_id}", status_code=204)
 def delete_todo(todo_id: int):
-    result = todo_data.pop(todo_id, {})
-    return todo_data
-
+    todo = todo_data.pop(todo_id, None)
+    if todo is None:
+        raise HTTPException(status_code=404, detail="Todo Not Found")
+    return
