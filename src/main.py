@@ -1,7 +1,12 @@
-from typing import Dict
+from typing import Dict, List
 
-from fastapi import Body, FastAPI, HTTPException
+from fastapi import Body, FastAPI, HTTPException, Depends
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
+
+from database.connection import get_db
+from database import repository
+from database.orm import ToDo
 
 app = FastAPI()
 
@@ -29,11 +34,11 @@ todo_data: Dict[int, TodoItem] = {
 
 
 @app.get("/todos", status_code=200)
-def get_todos(order: str | None = None):
-    result = list(todo_data.values())
+def get_todos(order: str | None = None, session: Session = Depends(get_db)):
+    todos: List[ToDo] = repository.get_todos(session=session)
     if order == "DESC":
-        return result[::-1]
-    return result
+        return todos[::-1]
+    return todos
 
 
 @app.post("/todos", status_code=201)
