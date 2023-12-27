@@ -3,7 +3,7 @@ from typing import List
 from pydantic import BaseModel
 
 
-class TodoSchema(BaseModel):
+class ToDoSchema(BaseModel):
     id: int
     contents: str
     is_done: bool
@@ -12,5 +12,5 @@ class TodoSchema(BaseModel):
         orm_mode = True
 
 
-class ListTodoResponse(BaseModel):
-    todos: List[TodoSchema]
+class ToDoListSchema(BaseModel):
+    todos: List[ToDoSchema]
