@@ -35,7 +35,9 @@ todo_data: Dict[int, TodoItem] = {
 
 
 @app.get("/todos", status_code=200)
-def get_todos(order: str | None = None, session: Session = Depends(get_db)) -> ListTodoResponse:
+def get_todos(
+    order: str | None = None, session: Session = Depends(get_db)
+) -> ListTodoResponse:
     todos: List[ToDo] = repository.get_todos(session=session)
     if order == "DESC":
         todos = todos[::-1]
@@ -49,11 +51,11 @@ def create_todos(request: CreateTodoRequest):
 
 
 @app.get("/todos/{todo_id}", status_code=200)
-def get_todo(todo_id: int):
-    todo = todo_data.get(todo_id)
+def get_todo(todo_id: int, session: Session = Depends(get_db)) -> TodoSchema:
+    todo: ToDo | None = repository.get_todo_by_todo_id(session=session, todo_id=todo_id)
     if todo is None:
         raise HTTPException(status_code=404, detail="Todo Not Found")
-    return todo
+    return TodoSchema.from_orm(todo)
 
 
 @app.patch("/todos/{todo_id}", status_code=200)
