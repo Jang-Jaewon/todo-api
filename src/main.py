@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from database import repository
 from database.connection import get_db
 from database.orm import ToDo
+from database.repository import create_todo
 from schema.request import CreateTodoRequest
 from schema.response import ToDoListSchema, ToDoSchema
 
@@ -27,10 +28,11 @@ def get_todos(
     return ToDoListSchema(todos=[ToDoSchema.from_orm(todo) for todo in todos])
 
 
-# @app.post("/todos", status_code=201)
-# def create_todos(request: CreateTodoRequest):
-#     todo_data[request.id] = request.dict()
-#     return todo_data[request.id]
+@app.post("/todos", status_code=201)
+def create_todos(request: CreateTodoRequest, session: Session = Depends(get_db)):
+    todo: ToDo = ToDo.create(request=request)
+    todo: ToDo = create_todo(session=session, todo=todo)
+    return ToDoSchema.from_orm(todo)
 
 
 @app.get("/todos/{todo_id}", status_code=200)

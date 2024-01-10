@@ -1,11 +1,6 @@
 from pydantic import BaseModel
 
 
-class TodoItem(BaseModel):
-    id: int
-    content: str
+class CreateTodoRequest(BaseModel):
+    contents: str
     is_done: bool
-
-
-class CreateTodoRequest(TodoItem):
-    pass
