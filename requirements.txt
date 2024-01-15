@@ -22,6 +22,7 @@ pycparser==2.21
 pydantic==1.10.13
 PyMySQL==1.1.0
 pytest==7.4.4
+pytest-mock==3.12.0
 python-dotenv==1.0.0
 PyYAML==6.0.1
 sniffio==1.3.0
