@@ -34,3 +34,27 @@ def test_get_todos(client, mocker):
             {"id": 1, "contents": "content 1", "is_done": True},
         ]
     }
+
+
+def test_get_todo(client, mocker):
+    # 200
+    mocker.patch(
+        "main.repository.get_todo_by_todo_id",
+        return_value=ToDo(id=1, contents="content 1", is_done=True),
+    )
+    response = client.get("/todos/1")
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": 1,
+        "contents": "content 1",
+        "is_done": True
+    }
+
+    # 400
+    mocker.patch("main.repository.get_todo_by_todo_id", return_value=None)
+    response = client.get("/todos/1")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Todo Not Found"}
+
+
+
