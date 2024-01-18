@@ -90,3 +90,20 @@ def test_update_todo(client, mocker):
     response = client.patch("/todos/1", json={"is_done": False})
     assert response.status_code == 404
     assert response.json() == {"detail": "Todo Not Found"}
+
+
+def test_delete_todo(client, mocker):
+    # 200
+    mocker.patch(
+        "main.repository.get_todo_by_todo_id",
+        return_value=ToDo(id=1, contents="content 1", is_done=True),
+    )
+    mocker.patch("main.repository.delete_todo", return_value=None)
+    response = client.delete("/todos/1")
+    assert response.status_code == 204
+
+    # 400
+    mocker.patch("main.repository.get_todo_by_todo_id", return_value=None)
+    response = client.delete("/todos/1")
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Todo Not Found"}
