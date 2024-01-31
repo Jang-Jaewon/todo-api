@@ -7,7 +7,10 @@ def test_get_todos(client, mocker):
     mocker.patch.object(
         ToDoRepository,
         "get_todos",
-        return_value=[ToDo(id=1, contents="content 1", is_done=True), ToDo(id=2, contents="content 2", is_done=False)],
+        return_value=[
+            ToDo(id=1, contents="content 1", is_done=True),
+            ToDo(id=2, contents="content 2", is_done=False),
+        ],
     )
     response = client.get("/todos")
     assert response.status_code == 200

@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Integer, String, ForeignKey
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import declarative_base, relationship
 
 from schema.request import CreateTodoRequest
@@ -40,3 +40,10 @@ class User(Base):
     username = Column(String(256), nullable=False)
     password = Column(String(256), nullable=False)
     todos = relationship("ToDo", lazy="joined")
+
+    @classmethod
+    def create(cls, username: str, hashed_password: str) -> "User":
+        return cls(
+            username=username,
+            password=hashed_password,
+        )
