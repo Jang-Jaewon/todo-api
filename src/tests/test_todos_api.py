@@ -8,12 +8,10 @@ def test_get_todos(client, mocker):
     headers = {"Authorization": f"Bearer {access_token}"}
     user = User(id=1, username="test", password="hashed")
     user.todos = [
-            ToDo(id=1, contents="content 1", is_done=True),
-            ToDo(id=2, contents="content 2", is_done=False),
+        ToDo(id=1, contents="content 1", is_done=True),
+        ToDo(id=2, contents="content 2", is_done=False),
     ]
-    mocker.patch.object(
-        UserRepository, "get_user_by_username", return_value=user
-    )
+    mocker.patch.object(UserRepository, "get_user_by_username", return_value=user)
 
     # order=ASC
     response = client.get("/todos", headers=headers)

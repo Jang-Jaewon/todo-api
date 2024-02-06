@@ -19,7 +19,6 @@ def get_todos(
     user_service: UserService = Depends(),
     user_repo: UserRepository = Depends(),
 ) -> ToDoListSchema:
-
     username: str = user_service.decode_jwt(access_token=access_token)
     user: User | None = user_repo.get_user_by_username(username=username)
     if not user:
