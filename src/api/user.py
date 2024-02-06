@@ -48,7 +48,7 @@ def log_in_user(
     return JWTResponseSchema(access_token=access_token)
 
 
-@router.post("/email/otp/verify")
+@router.post("/email/otp")
 def create_otp(
     request: CreateOTPRequest,
     _: str = Depends(get_access_token),
