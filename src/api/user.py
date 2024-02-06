@@ -3,7 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from cache import redis_client
 from database.orm import User
 from database.repository import UserRepository
-from schema.request import CreateOTPRequest, LogInRequest, SignUpRequest
+from schema.request import (CreateOTPRequest, LogInRequest, SignUpRequest,
+                            VerifyOTPRequest)
 from schema.response import JWTResponseSchema, UserSchema
 from security import get_access_token
 from service.user import UserService
@@ -59,3 +60,23 @@ def create_otp(
     redis_client.expire(request.email, 3 * 60)
 
     return {"otp": otp}
+
+
+@router.post("/email/otp/verify")
+def verify_otp(
+    request: VerifyOTPRequest,
+    access_token: str = Depends(get_access_token),
+    user_service: UserService = Depends(),
+    user_repo: UserRepository = Depends(),
+):
+    otp: str | None = redis_client.get(request.email)
+    if not otp or request.otp != int(otp):
+        raise HTTPException(status_code=400, detail="Bad Request")
+
+    username: str = user_service.decode_jwt(access_token=access_token)
+    user: User | None = user_repo.get_user_by_username(username=username)
+    if not user:
+        raise HTTPException(status_code=404, detail="User Not Found")
+
+    # save email to user
+    return UserSchema.from_orm(user)
