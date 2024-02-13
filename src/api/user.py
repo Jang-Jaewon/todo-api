@@ -79,4 +79,7 @@ def verify_otp(
         raise HTTPException(status_code=404, detail="User Not Found")
 
     # save email to user
+
+    # send email to user
+    user_service.send_email_to_user(email="admin@fastapi.com")
     return UserSchema.from_orm(user)
