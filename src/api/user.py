@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 
 from cache import redis_client
 from database.orm import User
@@ -65,6 +65,7 @@ def create_otp(
 @router.post("/email/otp/verify")
 def verify_otp(
     request: VerifyOTPRequest,
+    background_tasks: BackgroundTasks,
     access_token: str = Depends(get_access_token),
     user_service: UserService = Depends(),
     user_repo: UserRepository = Depends(),
@@ -81,5 +82,8 @@ def verify_otp(
     # save email to user
 
     # send email to user
-    user_service.send_email_to_user(email="admin@fastapi.com")
+    background_tasks.add_task(
+        user_service.send_email_to_user,
+        email="admin@fastapi.com"
+    )
     return UserSchema.from_orm(user)
